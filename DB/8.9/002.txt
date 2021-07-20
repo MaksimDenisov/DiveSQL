@@ -1,0 +1,35 @@
+
+id  group_id  value
+1   1         500
+2   2         500
+3   1         500
+4   2         500
+
+id  group_id  value
+1   1         300
+2   2         1000
+3   1         600
+4   2         500
+
+
+Работа состоит из трех транзакций
+
+-- Транзакция T1
+
+BEGIN TRANSACTION
+SELECT * FROM T WHERE group_id=1;
+UPDATE T SET value=value+100 WHERE group_id=1; ДОЛЖНА ВЫПОЛНИТЬСЯ
+COMMIT;
+
+-- Транзакция T2
+
+BEGIN TRANSACTION
+UPDATE T SET value=value*2 WHERE id=2; ; ДОЛЖНА ВЫПОЛНИТЬСЯ
+UPDATE T SET value=value/2 WHERE id=1; ДОЛЖНА ВЫПОЛНИТЬСЯ
+COMMIT;
+
+-- Транзакция T3
+
+BEGIN TRANSACTION
+UPDATE T SET value=value-50 WHERE group_id=2;  ; НЕ  ДОЛЖНА ВЫПОЛНИТЬСЯ
+COMMIT;

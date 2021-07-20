@@ -1,0 +1,38 @@
+T                 R
+-----------       ----------
+id | value        id | value
+-----------       ----------
+1    10           1    100
+2    20           2    200
+
+Транзакция  Действие
+--------------------------------------------
+T2          BEGIN ISOLATION LEVEL REPEATABLE READ;
+T1          BEGIN ISOLATION LEVEL READ COMMITTED;
+_t2_sum = 300 T2          SELECT SUM(value) INTO _t2_sum FROM R;
+T3          BEGIN ISOLATION LEVEL READ COMMITTED;
+_t1_value  = 10 T1          SELECT value INTO _t1_value FROM T WHERE id=1;
+_t3_max =  20  T3          SELECT MAX(value) INTO _t3_max FROM T;
+NC T1 = 60     T1          UPDATE T SET value = _t1_value + 50 WHERE id=1;
+T1          COMMIT;
+
+T                 R
+-----------       ----------
+id | value        id | value
+-----------       ----------
+1    60           1    100
+2    20           2    200
+
+T2          UPDATE T SET value = _t2_sum WHERE id=1;
+T2          COMMIT;
+
+T                 R
+-----------       ----------
+id | value        id | value
+-----------       ----------
+1    60           1    300
+2    20           2    80
+T3          UPDATE R SET value = _t3_max + (SELECT MAX(value) FROM T) WHERE id=2;
+T3          COMMIT;
+
+  2    80

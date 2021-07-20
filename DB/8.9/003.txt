@@ -1,0 +1,6 @@
+18 ms              - >  14 ms
+>6ms
+12 ms
+
+18ms                   14ms
+24ms                   26ms
